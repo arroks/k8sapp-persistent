@@ -1,0 +1,121 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dsamoshkin-config
+  namespace: {{ .Values.namespace }}
+data:
+  MICRONAUT_APP_JSON: "{
+  \"micronaut.config-client.enabled\": true,
+  \"datasources.default\":{\"driverClassName\": \"org.postgresql.Driver\",
+                          \"url\": \"${JDBC_DATABASE_URL}\",
+                          \"username\": \"${JDBC_DATABASE_USERNAME}\",
+                          \"password\": \"${JDBC_DATABASE_PASSWORD}\"
+  },
+  \"micronaut\": {
+    \"server.port\": {{ .Values.service.targetPort }},
+    \"router\": {
+      \"static-resources\": {
+        \"swagger\": {
+          \"paths\": \"classpath:META-INF/swagger\",
+          \"mapping\": \"/swagger/**\"
+        },
+        \"swagger-ui\": {
+          \"paths\": \"classpath:META-INF/swagger/views/swagger-ui\",
+          \"mapping\": \"/swagger-ui/**\"
+        }
+      }
+    }
+  },
+  \"endpoints\": {
+    \"health\": {
+      \"enabled\": true,
+      \"sensitive\": false,
+      \"liveness\": {
+        \"enabled\": true
+      },
+      \"readiness\": {
+        \"enabled\": true
+      }
+    },
+    \"info\": {
+      \"enabled\": true,
+      \"sensitive\": false
+    }
+  },
+  \"jpa.default\": {
+    \"entity-scan\": {
+      \"packages\": \"edu.otus.architect.dsamoshkin.model\"
+    },
+    \"properties.hibernate\": {
+      \"hbm2ddl\": {
+        \"auto\": \"update\"
+      },
+      \"show_sql\": true
+    }
+  },
+  \"kubernetes\": {
+    \"client\": {
+      \"discovery.enabled\": false,
+      \"namespace\": \"{{ .Values.namespace }}\",
+      \"config-maps\": {
+        \"labels\": [
+          {
+            \"app\": \"{{ include "dsamoshkin.fullname" . }}\"
+          }
+        ]
+      },
+      \"secrets\": {
+        \"enabled\": true,
+        \"labels\": [
+          {
+            \"app\": \"{{ include "dsamoshkin.fullname" . }}\"
+          }
+        ]
+      }
+    }
+  }
+ }"
+
+{{/*---*/}}
+
+{{/*apiVersion: v1*/}}
+{{/*kind: ConfigMap*/}}
+{{/*metadata:*/}}
+{{/*  name: dsamoshkin-app-config*/}}
+{{/*  namespace: {{ .Values.namespace }}*/}}
+{{/*  labels:*/}}
+{{/*    app: {{ include "dsamoshkin.fullname" . }}*/}}
+{{/*data:*/}}
+{{/*  application.yaml: |-*/}}
+{{/*    micronaut:*/}}
+{{/*      server.port: {{ .Values.service.targetPort }}*/}}
+{{/*      router:*/}}
+{{/*        static-resources:*/}}
+{{/*          swagger:*/}}
+{{/*            paths: 'classpath:META-INF/swagger'*/}}
+{{/*            mapping: /swagger/***/}}
+{{/*          swagger-ui:*/}}
+{{/*            paths: 'classpath:META-INF/swagger/views/swagger-ui'*/}}
+{{/*            mapping: /swagger-ui/***/}}
+{{/*    endpoints:*/}}
+{{/*      health:*/}}
+{{/*        enabled: true*/}}
+{{/*        sensitive: false*/}}
+{{/*        liveness:*/}}
+{{/*          enabled: true*/}}
+{{/*        readiness:*/}}
+{{/*          enabled: true*/}}
+{{/*      info:*/}}
+{{/*        enabled: true*/}}
+{{/*        sensitive: false*/}}
+{{/*    datasources.default:*/}}
+{{/*      driverClassName: org.postgresql.Driver*/}}
+{{/*    jpa.default:*/}}
+{{/*      entity-scan:*/}}
+{{/*        packages: edu.otus.architect.dsamoshkin.model*/}}
+{{/*      properties.hibernate:*/}}
+{{/*        bytecode:*/}}
+{{/*          provider: none*/}}
+{{/*        hbm2ddl:*/}}
+{{/*          auto: update*/}}
+{{/*        show_sql: true*/}}
